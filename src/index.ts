@@ -24,12 +24,22 @@ export enum Props {
   Payload = 'Payload',
   Qualifier = 'Qualifier',
 }
+const getEnv = (name: string) => {
+  const val = process.env[name.replace(/ /g, '_').toUpperCase()] || '';
+  return val.trim();
+};
 
 const setAWSCredentials = () => {
   AWS.config.credentials = {
-    accessKeyId: getInput(Credentials.AWS_ACCESS_KEY_ID),
-    secretAccessKey: getInput(Credentials.AWS_SECRET_ACCESS_KEY),
-    sessionToken: getInput(Credentials.AWS_SESSION_TOKEN),
+    accessKeyId:
+      getInput(Credentials.AWS_ACCESS_KEY_ID) ||
+      getEnv(Credentials.AWS_ACCESS_KEY_ID),
+    secretAccessKey:
+      getInput(Credentials.AWS_SECRET_ACCESS_KEY) ||
+      getEnv(Credentials.AWS_SECRET_ACCESS_KEY),
+    sessionToken:
+      getInput(Credentials.AWS_SESSION_TOKEN) ||
+      getEnv(Credentials.AWS_SESSION_TOKEN),
   };
 };
 

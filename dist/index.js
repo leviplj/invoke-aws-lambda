@@ -210,6 +210,58 @@ module.exports = {
 
 /***/ }),
 
+/***/ 22:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _validate = _interopRequireDefault(__webpack_require__(78));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function parse(uuid) {
+  if (!(0, _validate.default)(uuid)) {
+    throw TypeError('Invalid UUID');
+  }
+
+  let v;
+  const arr = new Uint8Array(16); // Parse ########-....-....-....-............
+
+  arr[0] = (v = parseInt(uuid.slice(0, 8), 16)) >>> 24;
+  arr[1] = v >>> 16 & 0xff;
+  arr[2] = v >>> 8 & 0xff;
+  arr[3] = v & 0xff; // Parse ........-####-....-....-............
+
+  arr[4] = (v = parseInt(uuid.slice(9, 13), 16)) >>> 8;
+  arr[5] = v & 0xff; // Parse ........-....-####-....-............
+
+  arr[6] = (v = parseInt(uuid.slice(14, 18), 16)) >>> 8;
+  arr[7] = v & 0xff; // Parse ........-....-....-####-............
+
+  arr[8] = (v = parseInt(uuid.slice(19, 23), 16)) >>> 8;
+  arr[9] = v & 0xff; // Parse ........-....-....-....-############
+  // (Use "/" to avoid 32-bit truncation when bit-shifting high-order bytes)
+
+  arr[10] = (v = parseInt(uuid.slice(24, 36), 16)) / 0x10000000000 & 0xff;
+  arr[11] = v / 0x100000000 & 0xff;
+  arr[12] = v >>> 24 & 0xff;
+  arr[13] = v >>> 16 & 0xff;
+  arr[14] = v >>> 8 & 0xff;
+  arr[15] = v & 0xff;
+  return arr;
+}
+
+var _default = parse;
+exports.default = _default;
+
+/***/ }),
+
 /***/ 35:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -425,6 +477,36 @@ Object.defineProperty(exports, "v5", {
     return _v4.default;
   }
 });
+Object.defineProperty(exports, "NIL", {
+  enumerable: true,
+  get: function () {
+    return _nil.default;
+  }
+});
+Object.defineProperty(exports, "version", {
+  enumerable: true,
+  get: function () {
+    return _version.default;
+  }
+});
+Object.defineProperty(exports, "validate", {
+  enumerable: true,
+  get: function () {
+    return _validate.default;
+  }
+});
+Object.defineProperty(exports, "stringify", {
+  enumerable: true,
+  get: function () {
+    return _stringify.default;
+  }
+});
+Object.defineProperty(exports, "parse", {
+  enumerable: true,
+  get: function () {
+    return _parse.default;
+  }
+});
 
 var _v = _interopRequireDefault(__webpack_require__(893));
 
@@ -434,7 +516,41 @@ var _v3 = _interopRequireDefault(__webpack_require__(733));
 
 var _v4 = _interopRequireDefault(__webpack_require__(384));
 
+var _nil = _interopRequireDefault(__webpack_require__(327));
+
+var _version = _interopRequireDefault(__webpack_require__(695));
+
+var _validate = _interopRequireDefault(__webpack_require__(78));
+
+var _stringify = _interopRequireDefault(__webpack_require__(411));
+
+var _parse = _interopRequireDefault(__webpack_require__(22));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+
+/***/ 78:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _regex = _interopRequireDefault(__webpack_require__(456));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function validate(uuid) {
+  return typeof uuid === 'string' && _regex.default.test(uuid);
+}
+
+var _default = validate;
+exports.default = _default;
 
 /***/ }),
 
@@ -442,6 +558,32 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /***/ (function(module) {
 
 module.exports = {"pagination":{"ListEventSources":{"input_token":"Marker","output_token":"NextMarker","limit_key":"MaxItems","result_key":"EventSources"},"ListFunctions":{"input_token":"Marker","output_token":"NextMarker","limit_key":"MaxItems","result_key":"Functions"}}};
+
+/***/ }),
+
+/***/ 82:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Sanitizes an input into a string so it can be passed into issueCommand safely
+ * @param input input to sanitize into a string
+ */
+function toCommandValue(input) {
+    if (input === null || input === undefined) {
+        return '';
+    }
+    else if (typeof input === 'string' || input instanceof String) {
+        return input;
+    }
+    return JSON.stringify(input);
+}
+exports.toCommandValue = toCommandValue;
+//# sourceMappingURL=utils.js.map
 
 /***/ }),
 
@@ -456,6 +598,42 @@ module.exports = require("os");
 /***/ (function(module) {
 
 module.exports = {"version":"2.0","metadata":{"apiVersion":"2015-03-31","endpointPrefix":"lambda","protocol":"rest-json","serviceFullName":"AWS Lambda","serviceId":"Lambda","signatureVersion":"v4","uid":"lambda-2015-03-31"},"operations":{"AddLayerVersionPermission":{"http":{"requestUri":"/2018-10-31/layers/{LayerName}/versions/{VersionNumber}/policy","responseCode":201},"input":{"type":"structure","required":["LayerName","VersionNumber","StatementId","Action","Principal"],"members":{"LayerName":{"location":"uri","locationName":"LayerName"},"VersionNumber":{"location":"uri","locationName":"VersionNumber","type":"long"},"StatementId":{},"Action":{},"Principal":{},"OrganizationId":{},"RevisionId":{"location":"querystring","locationName":"RevisionId"}}},"output":{"type":"structure","members":{"Statement":{},"RevisionId":{}}}},"AddPermission":{"http":{"requestUri":"/2015-03-31/functions/{FunctionName}/policy","responseCode":201},"input":{"type":"structure","required":["FunctionName","StatementId","Action","Principal"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"StatementId":{},"Action":{},"Principal":{},"SourceArn":{},"SourceAccount":{},"EventSourceToken":{},"Qualifier":{"location":"querystring","locationName":"Qualifier"},"RevisionId":{}}},"output":{"type":"structure","members":{"Statement":{}}}},"CreateAlias":{"http":{"requestUri":"/2015-03-31/functions/{FunctionName}/aliases","responseCode":201},"input":{"type":"structure","required":["FunctionName","Name","FunctionVersion"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Name":{},"FunctionVersion":{},"Description":{},"RoutingConfig":{"shape":"Sn"}}},"output":{"shape":"Sr"}},"CreateEventSourceMapping":{"http":{"requestUri":"/2015-03-31/event-source-mappings/","responseCode":202},"input":{"type":"structure","required":["EventSourceArn","FunctionName"],"members":{"EventSourceArn":{},"FunctionName":{},"Enabled":{"type":"boolean"},"BatchSize":{"type":"integer"},"MaximumBatchingWindowInSeconds":{"type":"integer"},"ParallelizationFactor":{"type":"integer"},"StartingPosition":{},"StartingPositionTimestamp":{"type":"timestamp"},"DestinationConfig":{"shape":"S10"},"MaximumRecordAgeInSeconds":{"type":"integer"},"BisectBatchOnFunctionError":{"type":"boolean"},"MaximumRetryAttempts":{"type":"integer"}}},"output":{"shape":"S17"}},"CreateFunction":{"http":{"requestUri":"/2015-03-31/functions","responseCode":201},"input":{"type":"structure","required":["FunctionName","Runtime","Role","Handler","Code"],"members":{"FunctionName":{},"Runtime":{},"Role":{},"Handler":{},"Code":{"type":"structure","members":{"ZipFile":{"shape":"S1d"},"S3Bucket":{},"S3Key":{},"S3ObjectVersion":{}}},"Description":{},"Timeout":{"type":"integer"},"MemorySize":{"type":"integer"},"Publish":{"type":"boolean"},"VpcConfig":{"shape":"S1k"},"DeadLetterConfig":{"shape":"S1p"},"Environment":{"shape":"S1r"},"KMSKeyArn":{},"TracingConfig":{"shape":"S1w"},"Tags":{"shape":"S1y"},"Layers":{"shape":"S21"}}},"output":{"shape":"S23"}},"DeleteAlias":{"http":{"method":"DELETE","requestUri":"/2015-03-31/functions/{FunctionName}/aliases/{Name}","responseCode":204},"input":{"type":"structure","required":["FunctionName","Name"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Name":{"location":"uri","locationName":"Name"}}}},"DeleteEventSourceMapping":{"http":{"method":"DELETE","requestUri":"/2015-03-31/event-source-mappings/{UUID}","responseCode":202},"input":{"type":"structure","required":["UUID"],"members":{"UUID":{"location":"uri","locationName":"UUID"}}},"output":{"shape":"S17"}},"DeleteFunction":{"http":{"method":"DELETE","requestUri":"/2015-03-31/functions/{FunctionName}","responseCode":204},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Qualifier":{"location":"querystring","locationName":"Qualifier"}}}},"DeleteFunctionConcurrency":{"http":{"method":"DELETE","requestUri":"/2017-10-31/functions/{FunctionName}/concurrency","responseCode":204},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"}}}},"DeleteFunctionEventInvokeConfig":{"http":{"method":"DELETE","requestUri":"/2019-09-25/functions/{FunctionName}/event-invoke-config","responseCode":204},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Qualifier":{"location":"querystring","locationName":"Qualifier"}}}},"DeleteLayerVersion":{"http":{"method":"DELETE","requestUri":"/2018-10-31/layers/{LayerName}/versions/{VersionNumber}","responseCode":204},"input":{"type":"structure","required":["LayerName","VersionNumber"],"members":{"LayerName":{"location":"uri","locationName":"LayerName"},"VersionNumber":{"location":"uri","locationName":"VersionNumber","type":"long"}}}},"DeleteProvisionedConcurrencyConfig":{"http":{"method":"DELETE","requestUri":"/2019-09-30/functions/{FunctionName}/provisioned-concurrency","responseCode":204},"input":{"type":"structure","required":["FunctionName","Qualifier"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Qualifier":{"location":"querystring","locationName":"Qualifier"}}}},"GetAccountSettings":{"http":{"method":"GET","requestUri":"/2016-08-19/account-settings/","responseCode":200},"input":{"type":"structure","members":{}},"output":{"type":"structure","members":{"AccountLimit":{"type":"structure","members":{"TotalCodeSize":{"type":"long"},"CodeSizeUnzipped":{"type":"long"},"CodeSizeZipped":{"type":"long"},"ConcurrentExecutions":{"type":"integer"},"UnreservedConcurrentExecutions":{"type":"integer"}}},"AccountUsage":{"type":"structure","members":{"TotalCodeSize":{"type":"long"},"FunctionCount":{"type":"long"}}}}}},"GetAlias":{"http":{"method":"GET","requestUri":"/2015-03-31/functions/{FunctionName}/aliases/{Name}","responseCode":200},"input":{"type":"structure","required":["FunctionName","Name"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Name":{"location":"uri","locationName":"Name"}}},"output":{"shape":"Sr"}},"GetEventSourceMapping":{"http":{"method":"GET","requestUri":"/2015-03-31/event-source-mappings/{UUID}","responseCode":200},"input":{"type":"structure","required":["UUID"],"members":{"UUID":{"location":"uri","locationName":"UUID"}}},"output":{"shape":"S17"}},"GetFunction":{"http":{"method":"GET","requestUri":"/2015-03-31/functions/{FunctionName}","responseCode":200},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Qualifier":{"location":"querystring","locationName":"Qualifier"}}},"output":{"type":"structure","members":{"Configuration":{"shape":"S23"},"Code":{"type":"structure","members":{"RepositoryType":{},"Location":{}}},"Tags":{"shape":"S1y"},"Concurrency":{"shape":"S34"}}}},"GetFunctionConcurrency":{"http":{"method":"GET","requestUri":"/2019-09-30/functions/{FunctionName}/concurrency","responseCode":200},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"}}},"output":{"type":"structure","members":{"ReservedConcurrentExecutions":{"type":"integer"}}}},"GetFunctionConfiguration":{"http":{"method":"GET","requestUri":"/2015-03-31/functions/{FunctionName}/configuration","responseCode":200},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Qualifier":{"location":"querystring","locationName":"Qualifier"}}},"output":{"shape":"S23"}},"GetFunctionEventInvokeConfig":{"http":{"method":"GET","requestUri":"/2019-09-25/functions/{FunctionName}/event-invoke-config","responseCode":200},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Qualifier":{"location":"querystring","locationName":"Qualifier"}}},"output":{"shape":"S3a"}},"GetLayerVersion":{"http":{"method":"GET","requestUri":"/2018-10-31/layers/{LayerName}/versions/{VersionNumber}","responseCode":200},"input":{"type":"structure","required":["LayerName","VersionNumber"],"members":{"LayerName":{"location":"uri","locationName":"LayerName"},"VersionNumber":{"location":"uri","locationName":"VersionNumber","type":"long"}}},"output":{"shape":"S3e"}},"GetLayerVersionByArn":{"http":{"method":"GET","requestUri":"/2018-10-31/layers?find=LayerVersion","responseCode":200},"input":{"type":"structure","required":["Arn"],"members":{"Arn":{"location":"querystring","locationName":"Arn"}}},"output":{"shape":"S3e"}},"GetLayerVersionPolicy":{"http":{"method":"GET","requestUri":"/2018-10-31/layers/{LayerName}/versions/{VersionNumber}/policy","responseCode":200},"input":{"type":"structure","required":["LayerName","VersionNumber"],"members":{"LayerName":{"location":"uri","locationName":"LayerName"},"VersionNumber":{"location":"uri","locationName":"VersionNumber","type":"long"}}},"output":{"type":"structure","members":{"Policy":{},"RevisionId":{}}}},"GetPolicy":{"http":{"method":"GET","requestUri":"/2015-03-31/functions/{FunctionName}/policy","responseCode":200},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Qualifier":{"location":"querystring","locationName":"Qualifier"}}},"output":{"type":"structure","members":{"Policy":{},"RevisionId":{}}}},"GetProvisionedConcurrencyConfig":{"http":{"method":"GET","requestUri":"/2019-09-30/functions/{FunctionName}/provisioned-concurrency","responseCode":200},"input":{"type":"structure","required":["FunctionName","Qualifier"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Qualifier":{"location":"querystring","locationName":"Qualifier"}}},"output":{"type":"structure","members":{"RequestedProvisionedConcurrentExecutions":{"type":"integer"},"AvailableProvisionedConcurrentExecutions":{"type":"integer"},"AllocatedProvisionedConcurrentExecutions":{"type":"integer"},"Status":{},"StatusReason":{},"LastModified":{}}}},"Invoke":{"http":{"requestUri":"/2015-03-31/functions/{FunctionName}/invocations"},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"InvocationType":{"location":"header","locationName":"X-Amz-Invocation-Type"},"LogType":{"location":"header","locationName":"X-Amz-Log-Type"},"ClientContext":{"location":"header","locationName":"X-Amz-Client-Context"},"Payload":{"shape":"S1d"},"Qualifier":{"location":"querystring","locationName":"Qualifier"}},"payload":"Payload"},"output":{"type":"structure","members":{"StatusCode":{"location":"statusCode","type":"integer"},"FunctionError":{"location":"header","locationName":"X-Amz-Function-Error"},"LogResult":{"location":"header","locationName":"X-Amz-Log-Result"},"Payload":{"shape":"S1d"},"ExecutedVersion":{"location":"header","locationName":"X-Amz-Executed-Version"}},"payload":"Payload"}},"InvokeAsync":{"http":{"requestUri":"/2014-11-13/functions/{FunctionName}/invoke-async/","responseCode":202},"input":{"type":"structure","required":["FunctionName","InvokeArgs"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"InvokeArgs":{"type":"blob","streaming":true}},"deprecated":true,"payload":"InvokeArgs"},"output":{"type":"structure","members":{"Status":{"location":"statusCode","type":"integer"}},"deprecated":true},"deprecated":true},"ListAliases":{"http":{"method":"GET","requestUri":"/2015-03-31/functions/{FunctionName}/aliases","responseCode":200},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"FunctionVersion":{"location":"querystring","locationName":"FunctionVersion"},"Marker":{"location":"querystring","locationName":"Marker"},"MaxItems":{"location":"querystring","locationName":"MaxItems","type":"integer"}}},"output":{"type":"structure","members":{"NextMarker":{},"Aliases":{"type":"list","member":{"shape":"Sr"}}}}},"ListEventSourceMappings":{"http":{"method":"GET","requestUri":"/2015-03-31/event-source-mappings/","responseCode":200},"input":{"type":"structure","members":{"EventSourceArn":{"location":"querystring","locationName":"EventSourceArn"},"FunctionName":{"location":"querystring","locationName":"FunctionName"},"Marker":{"location":"querystring","locationName":"Marker"},"MaxItems":{"location":"querystring","locationName":"MaxItems","type":"integer"}}},"output":{"type":"structure","members":{"NextMarker":{},"EventSourceMappings":{"type":"list","member":{"shape":"S17"}}}}},"ListFunctionEventInvokeConfigs":{"http":{"method":"GET","requestUri":"/2019-09-25/functions/{FunctionName}/event-invoke-config/list","responseCode":200},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Marker":{"location":"querystring","locationName":"Marker"},"MaxItems":{"location":"querystring","locationName":"MaxItems","type":"integer"}}},"output":{"type":"structure","members":{"FunctionEventInvokeConfigs":{"type":"list","member":{"shape":"S3a"}},"NextMarker":{}}}},"ListFunctions":{"http":{"method":"GET","requestUri":"/2015-03-31/functions/","responseCode":200},"input":{"type":"structure","members":{"MasterRegion":{"location":"querystring","locationName":"MasterRegion"},"FunctionVersion":{"location":"querystring","locationName":"FunctionVersion"},"Marker":{"location":"querystring","locationName":"Marker"},"MaxItems":{"location":"querystring","locationName":"MaxItems","type":"integer"}}},"output":{"type":"structure","members":{"NextMarker":{},"Functions":{"shape":"S4g"}}}},"ListLayerVersions":{"http":{"method":"GET","requestUri":"/2018-10-31/layers/{LayerName}/versions","responseCode":200},"input":{"type":"structure","required":["LayerName"],"members":{"CompatibleRuntime":{"location":"querystring","locationName":"CompatibleRuntime"},"LayerName":{"location":"uri","locationName":"LayerName"},"Marker":{"location":"querystring","locationName":"Marker"},"MaxItems":{"location":"querystring","locationName":"MaxItems","type":"integer"}}},"output":{"type":"structure","members":{"NextMarker":{},"LayerVersions":{"type":"list","member":{"shape":"S4l"}}}}},"ListLayers":{"http":{"method":"GET","requestUri":"/2018-10-31/layers","responseCode":200},"input":{"type":"structure","members":{"CompatibleRuntime":{"location":"querystring","locationName":"CompatibleRuntime"},"Marker":{"location":"querystring","locationName":"Marker"},"MaxItems":{"location":"querystring","locationName":"MaxItems","type":"integer"}}},"output":{"type":"structure","members":{"NextMarker":{},"Layers":{"type":"list","member":{"type":"structure","members":{"LayerName":{},"LayerArn":{},"LatestMatchingVersion":{"shape":"S4l"}}}}}}},"ListProvisionedConcurrencyConfigs":{"http":{"method":"GET","requestUri":"/2019-09-30/functions/{FunctionName}/provisioned-concurrency?List=ALL","responseCode":200},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Marker":{"location":"querystring","locationName":"Marker"},"MaxItems":{"location":"querystring","locationName":"MaxItems","type":"integer"}}},"output":{"type":"structure","members":{"ProvisionedConcurrencyConfigs":{"type":"list","member":{"type":"structure","members":{"FunctionArn":{},"RequestedProvisionedConcurrentExecutions":{"type":"integer"},"AvailableProvisionedConcurrentExecutions":{"type":"integer"},"AllocatedProvisionedConcurrentExecutions":{"type":"integer"},"Status":{},"StatusReason":{},"LastModified":{}}}},"NextMarker":{}}}},"ListTags":{"http":{"method":"GET","requestUri":"/2017-03-31/tags/{ARN}"},"input":{"type":"structure","required":["Resource"],"members":{"Resource":{"location":"uri","locationName":"ARN"}}},"output":{"type":"structure","members":{"Tags":{"shape":"S1y"}}}},"ListVersionsByFunction":{"http":{"method":"GET","requestUri":"/2015-03-31/functions/{FunctionName}/versions","responseCode":200},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Marker":{"location":"querystring","locationName":"Marker"},"MaxItems":{"location":"querystring","locationName":"MaxItems","type":"integer"}}},"output":{"type":"structure","members":{"NextMarker":{},"Versions":{"shape":"S4g"}}}},"PublishLayerVersion":{"http":{"requestUri":"/2018-10-31/layers/{LayerName}/versions","responseCode":201},"input":{"type":"structure","required":["LayerName","Content"],"members":{"LayerName":{"location":"uri","locationName":"LayerName"},"Description":{},"Content":{"type":"structure","members":{"S3Bucket":{},"S3Key":{},"S3ObjectVersion":{},"ZipFile":{"shape":"S1d"}}},"CompatibleRuntimes":{"shape":"S3h"},"LicenseInfo":{}}},"output":{"type":"structure","members":{"Content":{"shape":"S3f"},"LayerArn":{},"LayerVersionArn":{},"Description":{},"CreatedDate":{},"Version":{"type":"long"},"CompatibleRuntimes":{"shape":"S3h"},"LicenseInfo":{}}}},"PublishVersion":{"http":{"requestUri":"/2015-03-31/functions/{FunctionName}/versions","responseCode":201},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"CodeSha256":{},"Description":{},"RevisionId":{}}},"output":{"shape":"S23"}},"PutFunctionConcurrency":{"http":{"method":"PUT","requestUri":"/2017-10-31/functions/{FunctionName}/concurrency","responseCode":200},"input":{"type":"structure","required":["FunctionName","ReservedConcurrentExecutions"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"ReservedConcurrentExecutions":{"type":"integer"}}},"output":{"shape":"S34"}},"PutFunctionEventInvokeConfig":{"http":{"method":"PUT","requestUri":"/2019-09-25/functions/{FunctionName}/event-invoke-config","responseCode":200},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Qualifier":{"location":"querystring","locationName":"Qualifier"},"MaximumRetryAttempts":{"type":"integer"},"MaximumEventAgeInSeconds":{"type":"integer"},"DestinationConfig":{"shape":"S10"}}},"output":{"shape":"S3a"}},"PutProvisionedConcurrencyConfig":{"http":{"method":"PUT","requestUri":"/2019-09-30/functions/{FunctionName}/provisioned-concurrency","responseCode":202},"input":{"type":"structure","required":["FunctionName","Qualifier","ProvisionedConcurrentExecutions"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Qualifier":{"location":"querystring","locationName":"Qualifier"},"ProvisionedConcurrentExecutions":{"type":"integer"}}},"output":{"type":"structure","members":{"RequestedProvisionedConcurrentExecutions":{"type":"integer"},"AvailableProvisionedConcurrentExecutions":{"type":"integer"},"AllocatedProvisionedConcurrentExecutions":{"type":"integer"},"Status":{},"StatusReason":{},"LastModified":{}}}},"RemoveLayerVersionPermission":{"http":{"method":"DELETE","requestUri":"/2018-10-31/layers/{LayerName}/versions/{VersionNumber}/policy/{StatementId}","responseCode":204},"input":{"type":"structure","required":["LayerName","VersionNumber","StatementId"],"members":{"LayerName":{"location":"uri","locationName":"LayerName"},"VersionNumber":{"location":"uri","locationName":"VersionNumber","type":"long"},"StatementId":{"location":"uri","locationName":"StatementId"},"RevisionId":{"location":"querystring","locationName":"RevisionId"}}}},"RemovePermission":{"http":{"method":"DELETE","requestUri":"/2015-03-31/functions/{FunctionName}/policy/{StatementId}","responseCode":204},"input":{"type":"structure","required":["FunctionName","StatementId"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"StatementId":{"location":"uri","locationName":"StatementId"},"Qualifier":{"location":"querystring","locationName":"Qualifier"},"RevisionId":{"location":"querystring","locationName":"RevisionId"}}}},"TagResource":{"http":{"requestUri":"/2017-03-31/tags/{ARN}","responseCode":204},"input":{"type":"structure","required":["Resource","Tags"],"members":{"Resource":{"location":"uri","locationName":"ARN"},"Tags":{"shape":"S1y"}}}},"UntagResource":{"http":{"method":"DELETE","requestUri":"/2017-03-31/tags/{ARN}","responseCode":204},"input":{"type":"structure","required":["Resource","TagKeys"],"members":{"Resource":{"location":"uri","locationName":"ARN"},"TagKeys":{"location":"querystring","locationName":"tagKeys","type":"list","member":{}}}}},"UpdateAlias":{"http":{"method":"PUT","requestUri":"/2015-03-31/functions/{FunctionName}/aliases/{Name}","responseCode":200},"input":{"type":"structure","required":["FunctionName","Name"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Name":{"location":"uri","locationName":"Name"},"FunctionVersion":{},"Description":{},"RoutingConfig":{"shape":"Sn"},"RevisionId":{}}},"output":{"shape":"Sr"}},"UpdateEventSourceMapping":{"http":{"method":"PUT","requestUri":"/2015-03-31/event-source-mappings/{UUID}","responseCode":202},"input":{"type":"structure","required":["UUID"],"members":{"UUID":{"location":"uri","locationName":"UUID"},"FunctionName":{},"Enabled":{"type":"boolean"},"BatchSize":{"type":"integer"},"MaximumBatchingWindowInSeconds":{"type":"integer"},"DestinationConfig":{"shape":"S10"},"MaximumRecordAgeInSeconds":{"type":"integer"},"BisectBatchOnFunctionError":{"type":"boolean"},"MaximumRetryAttempts":{"type":"integer"},"ParallelizationFactor":{"type":"integer"}}},"output":{"shape":"S17"}},"UpdateFunctionCode":{"http":{"method":"PUT","requestUri":"/2015-03-31/functions/{FunctionName}/code","responseCode":200},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"ZipFile":{"shape":"S1d"},"S3Bucket":{},"S3Key":{},"S3ObjectVersion":{},"Publish":{"type":"boolean"},"DryRun":{"type":"boolean"},"RevisionId":{}}},"output":{"shape":"S23"}},"UpdateFunctionConfiguration":{"http":{"method":"PUT","requestUri":"/2015-03-31/functions/{FunctionName}/configuration","responseCode":200},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Role":{},"Handler":{},"Description":{},"Timeout":{"type":"integer"},"MemorySize":{"type":"integer"},"VpcConfig":{"shape":"S1k"},"Environment":{"shape":"S1r"},"Runtime":{},"DeadLetterConfig":{"shape":"S1p"},"KMSKeyArn":{},"TracingConfig":{"shape":"S1w"},"RevisionId":{},"Layers":{"shape":"S21"}}},"output":{"shape":"S23"}},"UpdateFunctionEventInvokeConfig":{"http":{"requestUri":"/2019-09-25/functions/{FunctionName}/event-invoke-config","responseCode":200},"input":{"type":"structure","required":["FunctionName"],"members":{"FunctionName":{"location":"uri","locationName":"FunctionName"},"Qualifier":{"location":"querystring","locationName":"Qualifier"},"MaximumRetryAttempts":{"type":"integer"},"MaximumEventAgeInSeconds":{"type":"integer"},"DestinationConfig":{"shape":"S10"}}},"output":{"shape":"S3a"}}},"shapes":{"Sn":{"type":"structure","members":{"AdditionalVersionWeights":{"type":"map","key":{},"value":{"type":"double"}}}},"Sr":{"type":"structure","members":{"AliasArn":{},"Name":{},"FunctionVersion":{},"Description":{},"RoutingConfig":{"shape":"Sn"},"RevisionId":{}}},"S10":{"type":"structure","members":{"OnSuccess":{"type":"structure","members":{"Destination":{}}},"OnFailure":{"type":"structure","members":{"Destination":{}}}}},"S17":{"type":"structure","members":{"UUID":{},"BatchSize":{"type":"integer"},"MaximumBatchingWindowInSeconds":{"type":"integer"},"ParallelizationFactor":{"type":"integer"},"EventSourceArn":{},"FunctionArn":{},"LastModified":{"type":"timestamp"},"LastProcessingResult":{},"State":{},"StateTransitionReason":{},"DestinationConfig":{"shape":"S10"},"MaximumRecordAgeInSeconds":{"type":"integer"},"BisectBatchOnFunctionError":{"type":"boolean"},"MaximumRetryAttempts":{"type":"integer"}}},"S1d":{"type":"blob","sensitive":true},"S1k":{"type":"structure","members":{"SubnetIds":{"shape":"S1l"},"SecurityGroupIds":{"shape":"S1n"}}},"S1l":{"type":"list","member":{}},"S1n":{"type":"list","member":{}},"S1p":{"type":"structure","members":{"TargetArn":{}}},"S1r":{"type":"structure","members":{"Variables":{"shape":"S1s"}}},"S1s":{"type":"map","key":{"type":"string","sensitive":true},"value":{"type":"string","sensitive":true},"sensitive":true},"S1w":{"type":"structure","members":{"Mode":{}}},"S1y":{"type":"map","key":{},"value":{}},"S21":{"type":"list","member":{}},"S23":{"type":"structure","members":{"FunctionName":{},"FunctionArn":{},"Runtime":{},"Role":{},"Handler":{},"CodeSize":{"type":"long"},"Description":{},"Timeout":{"type":"integer"},"MemorySize":{"type":"integer"},"LastModified":{},"CodeSha256":{},"Version":{},"VpcConfig":{"type":"structure","members":{"SubnetIds":{"shape":"S1l"},"SecurityGroupIds":{"shape":"S1n"},"VpcId":{}}},"DeadLetterConfig":{"shape":"S1p"},"Environment":{"type":"structure","members":{"Variables":{"shape":"S1s"},"Error":{"type":"structure","members":{"ErrorCode":{},"Message":{"type":"string","sensitive":true}}}}},"KMSKeyArn":{},"TracingConfig":{"type":"structure","members":{"Mode":{}}},"MasterArn":{},"RevisionId":{},"Layers":{"type":"list","member":{"type":"structure","members":{"Arn":{},"CodeSize":{"type":"long"}}}},"State":{},"StateReason":{},"StateReasonCode":{},"LastUpdateStatus":{},"LastUpdateStatusReason":{},"LastUpdateStatusReasonCode":{}}},"S34":{"type":"structure","members":{"ReservedConcurrentExecutions":{"type":"integer"}}},"S3a":{"type":"structure","members":{"LastModified":{"type":"timestamp"},"FunctionArn":{},"MaximumRetryAttempts":{"type":"integer"},"MaximumEventAgeInSeconds":{"type":"integer"},"DestinationConfig":{"shape":"S10"}}},"S3e":{"type":"structure","members":{"Content":{"shape":"S3f"},"LayerArn":{},"LayerVersionArn":{},"Description":{},"CreatedDate":{},"Version":{"type":"long"},"CompatibleRuntimes":{"shape":"S3h"},"LicenseInfo":{}}},"S3f":{"type":"structure","members":{"Location":{},"CodeSha256":{},"CodeSize":{"type":"long"}}},"S3h":{"type":"list","member":{}},"S4g":{"type":"list","member":{"shape":"S23"}},"S4l":{"type":"structure","members":{"LayerVersionArn":{},"Version":{"type":"long"},"Description":{},"CreatedDate":{},"CompatibleRuntimes":{"shape":"S3h"},"LicenseInfo":{}}}}};
+
+/***/ }),
+
+/***/ 102:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+// For internal use, subject to change.
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const fs = __importStar(__webpack_require__(747));
+const os = __importStar(__webpack_require__(87));
+const utils_1 = __webpack_require__(82);
+function issueCommand(command, message) {
+    const filePath = process.env[`GITHUB_${command}`];
+    if (!filePath) {
+        throw new Error(`Unable to find environment variable for file command ${command}`);
+    }
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`Missing file at path: ${filePath}`);
+    }
+    fs.appendFileSync(filePath, `${utils_1.toCommandValue(message)}${os.EOL}`, {
+        encoding: 'utf8'
+    });
+}
+exports.issueCommand = issueCommand;
+//# sourceMappingURL=file-command.js.map
 
 /***/ }),
 
@@ -2849,7 +3027,7 @@ module.exports = require("dgram");
 /***/ }),
 
 /***/ 209:
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
@@ -2868,7 +3046,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const v3 = (0, _v.default)('v3', 0x30, _md.default);
 var _default = v3;
 exports.default = _default;
-module.exports = exports.default;
 
 /***/ }),
 
@@ -2910,26 +3087,19 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = _default;
 exports.URL = exports.DNS = void 0;
 
-var _bytesToUuid = _interopRequireDefault(__webpack_require__(390));
+var _stringify = _interopRequireDefault(__webpack_require__(411));
+
+var _parse = _interopRequireDefault(__webpack_require__(22));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function uuidToBytes(uuid) {
-  // Note: We assume we're being passed a valid uuid string
-  var bytes = [];
-  uuid.replace(/[a-fA-F0-9]{2}/g, function (hex) {
-    bytes.push(parseInt(hex, 16));
-  });
-  return bytes;
-}
 
 function stringToBytes(str) {
   str = unescape(encodeURIComponent(str)); // UTF8 escape
 
-  var bytes = new Array(str.length);
+  const bytes = [];
 
-  for (var i = 0; i < str.length; i++) {
-    bytes[i] = str.charCodeAt(i);
+  for (let i = 0; i < str.length; ++i) {
+    bytes.push(str.charCodeAt(i));
   }
 
   return bytes;
@@ -2941,29 +3111,45 @@ const URL = '6ba7b811-9dad-11d1-80b4-00c04fd430c8';
 exports.URL = URL;
 
 function _default(name, version, hashfunc) {
-  var generateUUID = function (value, namespace, buf, offset) {
-    var off = buf && offset || 0;
-    if (typeof value == 'string') value = stringToBytes(value);
-    if (typeof namespace == 'string') namespace = uuidToBytes(namespace);
-    if (!Array.isArray(value)) throw TypeError('value must be an array of bytes');
-    if (!Array.isArray(namespace) || namespace.length !== 16) throw TypeError('namespace must be uuid string or an Array of 16 byte values'); // Per 4.3
+  function generateUUID(value, namespace, buf, offset) {
+    if (typeof value === 'string') {
+      value = stringToBytes(value);
+    }
 
-    var bytes = hashfunc(namespace.concat(value));
+    if (typeof namespace === 'string') {
+      namespace = (0, _parse.default)(namespace);
+    }
+
+    if (namespace.length !== 16) {
+      throw TypeError('Namespace must be array-like (16 iterable integer values, 0-255)');
+    } // Compute hash of namespace and value, Per 4.3
+    // Future: Use spread syntax when supported on all platforms, e.g. `bytes =
+    // hashfunc([...namespace, ... value])`
+
+
+    let bytes = new Uint8Array(16 + value.length);
+    bytes.set(namespace);
+    bytes.set(value, namespace.length);
+    bytes = hashfunc(bytes);
     bytes[6] = bytes[6] & 0x0f | version;
     bytes[8] = bytes[8] & 0x3f | 0x80;
 
     if (buf) {
-      for (var idx = 0; idx < 16; ++idx) {
-        buf[off + idx] = bytes[idx];
+      offset = offset || 0;
+
+      for (let i = 0; i < 16; ++i) {
+        buf[offset + i] = bytes[i];
       }
+
+      return buf;
     }
 
-    return buf || (0, _bytesToUuid.default)(bytes);
-  }; // Function#name is not settable on some platforms (#270)
+    return (0, _stringify.default)(bytes);
+  } // Function#name is not settable on some platforms (#270)
 
 
   try {
-    generateUUID.name = name;
+    generateUUID.name = name; // eslint-disable-next-line no-empty
   } catch (err) {} // For CommonJS default export support
 
 
@@ -3632,6 +3818,21 @@ AWS.ECSCredentials = AWS.RemoteCredentials;
 
 /***/ }),
 
+/***/ 327:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = '00000000-0000-0000-0000-000000000000';
+exports.default = _default;
+
+/***/ }),
+
 /***/ 337:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -3770,7 +3971,7 @@ AWS.util.update(AWS.CognitoIdentity.prototype, {
 /***/ }),
 
 /***/ 384:
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
@@ -3789,41 +3990,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const v5 = (0, _v.default)('v5', 0x50, _sha.default);
 var _default = v5;
 exports.default = _default;
-module.exports = exports.default;
-
-/***/ }),
-
-/***/ 390:
-/***/ (function(module, exports) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-/**
- * Convert array of 16 byte values to UUID string format of the form:
- * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
- */
-var byteToHex = [];
-
-for (var i = 0; i < 256; ++i) {
-  byteToHex[i] = (i + 0x100).toString(16).substr(1);
-}
-
-function bytesToUuid(buf, offset) {
-  var i = offset || 0;
-  var bth = byteToHex; // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
-
-  return [bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], '-', bth[buf[i++]], bth[buf[i++]], '-', bth[buf[i++]], bth[buf[i++]], '-', bth[buf[i++]], bth[buf[i++]], '-', bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]], bth[buf[i++]]].join('');
-}
-
-var _default = bytesToUuid;
-exports.default = _default;
-module.exports = exports.default;
 
 /***/ }),
 
@@ -3996,22 +4162,48 @@ module.exports = {
 /***/ }),
 
 /***/ 411:
-/***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
-var AWS = __webpack_require__(395);
+"use strict";
 
-AWS.util.update(AWS.Lambda.prototype, {
-  /**
-   * @api private
-   */
-  setupRequestListeners: function setupRequestListeners(request) {
-    if (request.operation === 'invoke') {
-      request.addListener('extractData', AWS.util.convertPayloadToString);
-    }
-  }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.default = void 0;
 
+var _validate = _interopRequireDefault(__webpack_require__(78));
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+const byteToHex = [];
+
+for (let i = 0; i < 256; ++i) {
+  byteToHex.push((i + 0x100).toString(16).substr(1));
+}
+
+function stringify(arr, offset = 0) {
+  // Note: Be careful editing this code!  It's been tuned for performance
+  // and works in ways you may not expect. See https://github.com/uuidjs/uuid/pull/434
+  const uuid = (byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + '-' + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + '-' + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + '-' + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + '-' + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]]).toLowerCase(); // Consistency check for valid UUID.  If this throws, it's likely due to one
+  // of the following:
+  // - One or more input array values don't map to a hex octet (leading to
+  // "undefined" in the uuid)
+  // - Invalid input values for the RFC `version` or `variant` fields
+
+  if (!(0, _validate.default)(uuid)) {
+    throw TypeError('Stringified UUID is invalid');
+  }
+
+  return uuid;
+}
+
+var _default = stringify;
+exports.default = _default;
 
 /***/ }),
 
@@ -4344,6 +4536,26 @@ AWS.RemoteCredentials = AWS.util.inherit(AWS.Credentials, {
     });
   }
 });
+
+
+/***/ }),
+
+/***/ 429:
+/***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
+
+var AWS = __webpack_require__(395);
+
+AWS.util.update(AWS.Lambda.prototype, {
+  /**
+   * @api private
+   */
+  setupRequestListeners: function setupRequestListeners(request) {
+    if (request.operation === 'invoke') {
+      request.addListener('extractData', AWS.util.convertPayloadToString);
+    }
+  }
+});
+
 
 
 /***/ }),
@@ -5563,6 +5775,21 @@ AWS.util.mixin(AWS.Request, AWS.SequentialExecutor);
 
 /***/ }),
 
+/***/ 456:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i;
+exports.default = _default;
+
+/***/ }),
+
 /***/ 458:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -5921,6 +6148,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const command_1 = __webpack_require__(804);
+const file_command_1 = __webpack_require__(102);
+const utils_1 = __webpack_require__(82);
 const os = __importStar(__webpack_require__(87));
 const path = __importStar(__webpack_require__(622));
 /**
@@ -5947,9 +6176,17 @@ var ExitCode;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function exportVariable(name, val) {
-    const convertedVal = command_1.toCommandValue(val);
+    const convertedVal = utils_1.toCommandValue(val);
     process.env[name] = convertedVal;
-    command_1.issueCommand('set-env', { name }, convertedVal);
+    const filePath = process.env['GITHUB_ENV'] || '';
+    if (filePath) {
+        const delimiter = '_GitHubActionsFileCommandDelimeter_';
+        const commandValue = `${name}<<${delimiter}${os.EOL}${convertedVal}${os.EOL}${delimiter}`;
+        file_command_1.issueCommand('ENV', commandValue);
+    }
+    else {
+        command_1.issueCommand('set-env', { name }, convertedVal);
+    }
 }
 exports.exportVariable = exportVariable;
 /**
@@ -5965,7 +6202,13 @@ exports.setSecret = setSecret;
  * @param inputPath
  */
 function addPath(inputPath) {
-    command_1.issueCommand('add-path', {}, inputPath);
+    const filePath = process.env['GITHUB_PATH'] || '';
+    if (filePath) {
+        file_command_1.issueCommand('PATH', inputPath);
+    }
+    else {
+        command_1.issueCommand('add-path', {}, inputPath);
+    }
     process.env['PATH'] = `${inputPath}${path.delimiter}${process.env['PATH']}`;
 }
 exports.addPath = addPath;
@@ -6413,7 +6656,7 @@ module.exports = XmlBuilder;
 /***/ }),
 
 /***/ 498:
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
@@ -6439,7 +6682,6 @@ function sha1(bytes) {
 
 var _default = sha1;
 exports.default = _default;
-module.exports = exports.default;
 
 /***/ }),
 
@@ -9161,11 +9403,18 @@ var Props;
     Props["Payload"] = "Payload";
     Props["Qualifier"] = "Qualifier";
 })(Props || (Props = {}));
+const getEnv = (name) => {
+    const val = process.env[name.replace(/ /g, '_').toUpperCase()] || '';
+    return val.trim();
+};
 const setAWSCredentials = () => {
     global_default.a.config.credentials = {
-        accessKeyId: Object(core.getInput)(Credentials.AWS_ACCESS_KEY_ID),
-        secretAccessKey: Object(core.getInput)(Credentials.AWS_SECRET_ACCESS_KEY),
-        sessionToken: Object(core.getInput)(Credentials.AWS_SESSION_TOKEN),
+        accessKeyId: Object(core.getInput)(Credentials.AWS_ACCESS_KEY_ID) ||
+            getEnv(Credentials.AWS_ACCESS_KEY_ID),
+        secretAccessKey: Object(core.getInput)(Credentials.AWS_SECRET_ACCESS_KEY) ||
+            getEnv(Credentials.AWS_SECRET_ACCESS_KEY),
+        sessionToken: Object(core.getInput)(Credentials.AWS_SESSION_TOKEN) ||
+            getEnv(Credentials.AWS_SESSION_TOKEN),
     };
 };
 const getParams = () => {
@@ -12115,6 +12364,34 @@ module.exports = {"acm":{"name":"ACM","cors":true},"apigateway":{"name":"APIGate
 
 /***/ }),
 
+/***/ 695:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _validate = _interopRequireDefault(__webpack_require__(78));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function version(uuid) {
+  if (!(0, _validate.default)(uuid)) {
+    throw TypeError('Invalid UUID');
+  }
+
+  return parseInt(uuid.substr(14, 1), 16);
+}
+
+var _default = version;
+exports.default = _default;
+
+/***/ }),
+
 /***/ 696:
 /***/ (function(module) {
 
@@ -12646,7 +12923,7 @@ var apiLoader = AWS.apiLoader;
 
 apiLoader.services['lambda'] = {};
 AWS.Lambda = Service.defineService('lambda', ['2014-11-11', '2015-03-31']);
-__webpack_require__(411);
+__webpack_require__(429);
 Object.defineProperty(apiLoader.services['lambda'], '2014-11-11', {
   get: function get() {
     var model = __webpack_require__(166);
@@ -12673,7 +12950,7 @@ module.exports = AWS.Lambda;
 /***/ }),
 
 /***/ 733:
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
@@ -12685,38 +12962,34 @@ exports.default = void 0;
 
 var _rng = _interopRequireDefault(__webpack_require__(844));
 
-var _bytesToUuid = _interopRequireDefault(__webpack_require__(390));
+var _stringify = _interopRequireDefault(__webpack_require__(411));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function v4(options, buf, offset) {
-  var i = buf && offset || 0;
-
-  if (typeof options == 'string') {
-    buf = options === 'binary' ? new Array(16) : null;
-    options = null;
-  }
-
   options = options || {};
 
-  var rnds = options.random || (options.rng || _rng.default)(); // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+  const rnds = options.random || (options.rng || _rng.default)(); // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
 
 
   rnds[6] = rnds[6] & 0x0f | 0x40;
   rnds[8] = rnds[8] & 0x3f | 0x80; // Copy bytes to buffer, if provided
 
   if (buf) {
-    for (var ii = 0; ii < 16; ++ii) {
-      buf[i + ii] = rnds[ii];
+    offset = offset || 0;
+
+    for (let i = 0; i < 16; ++i) {
+      buf[offset + i] = rnds[i];
     }
+
+    return buf;
   }
 
-  return buf || (0, _bytesToUuid.default)(rnds);
+  return (0, _stringify.default)(rnds);
 }
 
 var _default = v4;
 exports.default = _default;
-module.exports = exports.default;
 
 /***/ }),
 
@@ -16283,7 +16556,7 @@ module.exports = AWS.Signers.V3;
 /***/ }),
 
 /***/ 803:
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
@@ -16309,7 +16582,6 @@ function md5(bytes) {
 
 var _default = md5;
 exports.default = _default;
-module.exports = exports.default;
 
 /***/ }),
 
@@ -16327,6 +16599,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const os = __importStar(__webpack_require__(87));
+const utils_1 = __webpack_require__(82);
 /**
  * Commands
  *
@@ -16380,28 +16653,14 @@ class Command {
         return cmdStr;
     }
 }
-/**
- * Sanitizes an input into a string so it can be passed into issueCommand safely
- * @param input input to sanitize into a string
- */
-function toCommandValue(input) {
-    if (input === null || input === undefined) {
-        return '';
-    }
-    else if (typeof input === 'string' || input instanceof String) {
-        return input;
-    }
-    return JSON.stringify(input);
-}
-exports.toCommandValue = toCommandValue;
 function escapeData(s) {
-    return toCommandValue(s)
+    return utils_1.toCommandValue(s)
         .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A');
 }
 function escapeProperty(s) {
-    return toCommandValue(s)
+    return utils_1.toCommandValue(s)
         .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A')
@@ -17131,7 +17390,7 @@ __webpack_require__(951);
 /***/ }),
 
 /***/ 844:
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
@@ -17145,11 +17404,19 @@ var _crypto = _interopRequireDefault(__webpack_require__(417));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function rng() {
-  return _crypto.default.randomBytes(16);
-}
+const rnds8Pool = new Uint8Array(256); // # of random values to pre-allocate
 
-module.exports = exports.default;
+let poolPtr = rnds8Pool.length;
+
+function rng() {
+  if (poolPtr > rnds8Pool.length - 16) {
+    _crypto.default.randomFillSync(rnds8Pool);
+
+    poolPtr = 0;
+  }
+
+  return rnds8Pool.slice(poolPtr, poolPtr += 16);
+}
 
 /***/ }),
 
@@ -18769,7 +19036,7 @@ module.exports.iniLoader = new IniLoader();
 /***/ }),
 
 /***/ 893:
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
@@ -18781,7 +19048,7 @@ exports.default = void 0;
 
 var _rng = _interopRequireDefault(__webpack_require__(844));
 
-var _bytesToUuid = _interopRequireDefault(__webpack_require__(390));
+var _stringify = _interopRequireDefault(__webpack_require__(411));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18789,25 +19056,25 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 // Inspired by https://github.com/LiosK/UUID.js
 // and http://docs.python.org/library/uuid.html
-var _nodeId;
+let _nodeId;
 
-var _clockseq; // Previous uuid creation time
+let _clockseq; // Previous uuid creation time
 
 
-var _lastMSecs = 0;
-var _lastNSecs = 0; // See https://github.com/uuidjs/uuid for API details
+let _lastMSecs = 0;
+let _lastNSecs = 0; // See https://github.com/uuidjs/uuid for API details
 
 function v1(options, buf, offset) {
-  var i = buf && offset || 0;
-  var b = buf || [];
+  let i = buf && offset || 0;
+  const b = buf || new Array(16);
   options = options || {};
-  var node = options.node || _nodeId;
-  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq; // node and clockseq need to be initialized to random values if they're not
+  let node = options.node || _nodeId;
+  let clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq; // node and clockseq need to be initialized to random values if they're not
   // specified.  We do this lazily to minimize issues related to insufficient
   // system entropy.  See #189
 
   if (node == null || clockseq == null) {
-    var seedBytes = options.random || (options.rng || _rng.default)();
+    const seedBytes = options.random || (options.rng || _rng.default)();
 
     if (node == null) {
       // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
@@ -18824,12 +19091,12 @@ function v1(options, buf, offset) {
   // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
 
 
-  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime(); // Per 4.2.1.2, use count of uuid's generated during the current clock
+  let msecs = options.msecs !== undefined ? options.msecs : Date.now(); // Per 4.2.1.2, use count of uuid's generated during the current clock
   // cycle to simulate higher resolution clock
 
-  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1; // Time since last uuid creation (in msecs)
+  let nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1; // Time since last uuid creation (in msecs)
 
-  var dt = msecs - _lastMSecs + (nsecs - _lastNSecs) / 10000; // Per 4.2.1.2, Bump clockseq on clock regression
+  const dt = msecs - _lastMSecs + (nsecs - _lastNSecs) / 10000; // Per 4.2.1.2, Bump clockseq on clock regression
 
   if (dt < 0 && options.clockseq === undefined) {
     clockseq = clockseq + 1 & 0x3fff;
@@ -18852,13 +19119,13 @@ function v1(options, buf, offset) {
 
   msecs += 12219292800000; // `time_low`
 
-  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+  const tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
   b[i++] = tl >>> 24 & 0xff;
   b[i++] = tl >>> 16 & 0xff;
   b[i++] = tl >>> 8 & 0xff;
   b[i++] = tl & 0xff; // `time_mid`
 
-  var tmh = msecs / 0x100000000 * 10000 & 0xfffffff;
+  const tmh = msecs / 0x100000000 * 10000 & 0xfffffff;
   b[i++] = tmh >>> 8 & 0xff;
   b[i++] = tmh & 0xff; // `time_high_and_version`
 
@@ -18870,16 +19137,15 @@ function v1(options, buf, offset) {
 
   b[i++] = clockseq & 0xff; // `node`
 
-  for (var n = 0; n < 6; ++n) {
+  for (let n = 0; n < 6; ++n) {
     b[i + n] = node[n];
   }
 
-  return buf ? buf : (0, _bytesToUuid.default)(b);
+  return buf || (0, _stringify.default)(b);
 }
 
 var _default = v1;
 exports.default = _default;
-module.exports = exports.default;
 
 /***/ }),
 
